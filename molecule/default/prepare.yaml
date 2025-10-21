@@ -1,0 +1,40 @@
+---
+- name: Prepare controller
+  hosts: localhost # DevSkim: ignore DS162092
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+    roles_dir: "{{ lookup('env', 'ANSIBLE_ROLES_PATH').split(':')[-1] }}"
+  tasks:
+    - name: Create molecule roles directory
+      ansible.builtin.file:
+        path: "{{ roles_dir }}"
+        state: directory
+        force: true
+        recurse: true
+    - name: Symbolic links to roles
+      ansible.builtin.file:
+        src: "/ansible/deps/roles/{{ role }}"
+        dest: "{{ roles_dir }}/{{ role }}"
+        state: link
+        force: true
+      loop:
+        - "ansible-mini-vault"
+      loop_control:
+        loop_var: role
+- name: Prepare targets
+  hosts: all
+  tasks:
+    - name: Install requirements
+      ansible.builtin.apt:
+        name: unzip
+        update_cache: true
+        install_recommends: false
+      poll: 5
+      async: 77
+      register: _temp_result
+      until: _temp_result is succeeded
+      timeout: 333
+      retries: 5
+      delay: 1

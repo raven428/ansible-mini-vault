@@ -1,0 +1,57 @@
+---
+- name: Perform actions from inventory variables
+  hosts: all
+  pre_tasks:
+    - name: Manage the check mode flag
+      ansible.builtin.file:
+        path: "{{ check_flag }}"
+        state: "{{ 'directory' if ansible_check_mode else 'absent' }}"
+        mode: "0755"
+      check_mode: false
+      tags: [always]
+  tasks:
+    - name: Main call of the role
+      ansible.builtin.include_role:
+        name: ansible-mini-vault
+      when: "prop_mode == 'none'"
+      tags: [service-vault]
+
+    - name: Block for unseal
+      when: "prop_mode == 'unseal'"
+      tags: [service-vault]
+      block:
+        - name: Read key files
+          ansible.builtin.shell: "/usr/bin/env cat {{ secure_dir }}/{{ unit_name
+            }}/unseal* 2>/dev/null || true"
+          register: read_keys
+          changed_when: false
+
+        - name: Restart systemd service before unseal
+          ansible.builtin.systemd:
+            name: "{{ unit_name }}"
+            state: "restarted"
+          when: "molecule_stage != 'idempotence'"
+
+        - name: Call role with keys in files
+          ansible.builtin.include_role:
+            name: ansible-mini-vault
+
+        - name: Restart systemd service before unseal
+          ansible.builtin.systemd:
+            name: "{{ unit_name }}"
+            state: "restarted"
+          when: "molecule_stage != 'idempotence'"
+
+        - name: Call role with keys in variable
+          ansible.builtin.include_role:
+            name: ansible-mini-vault
+          vars:
+            keys_list: "{{ read_keys.stdout_lines | list }}"
+
+    - name: Check failure cases for stop manifests
+      ansible.builtin.include_tasks:
+        file: "includes/fail-test.yaml"
+        apply:
+          tags: [service-vault]
+      when: "prop_mode.startswith('fail-')"
+      tags: [service-vault]
