@@ -1,0 +1,5 @@
+---
+unit_name: vault
+secure_dir: "/deploy/secure"
+local_bin_path: "/usr/local/bin"
+service_home: "/var/lib/{{ unit_name }}"

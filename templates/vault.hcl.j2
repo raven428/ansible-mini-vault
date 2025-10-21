@@ -1,0 +1,47 @@
+#
+# {{ ansible_managed }}
+#
+{%- set def = {
+  'ui': 'true',
+  'listener1': {
+    'name': 'listener',
+    'value': 'tcp',
+    'params': {
+      'tls_disable': '1',
+      'address': '127.0.0.1:8200',
+    },
+  },
+  'storage': {
+    'name': 'storage',
+    'value': 'file',
+    'params': {
+      'path': v.hashi_vault_service_home | default('/var/lib/vault-default'),
+      'test': '425',
+    },
+  },
+} -%}
+{%- macro render_block(name, data, indent=0) -%}
+  {%- set space = '  ' * indent -%}
+  {%- if data is mapping and 'name' in data and 'value' in data and 'params' in data -%}
+    {{ '\n' }}{{ space }}{{ data.name }} "{{ data.value }}" {
+    {%- for k, v in data.params.items() -%}
+      {{ render_block(k, v, indent + 1) }}
+    {%- endfor -%}
+    {{ '\n' }}{{ space }}}
+  {%- else -%}
+    {%- if data is mapping and 'name' in data and 'value' in data -%}
+      {%- set key = data.name -%}
+      {%- set value = data.value -%}
+    {%- else -%}
+      {%- set key = name -%}
+      {%- set value = data -%}
+    {%- endif -%}
+    {%- if value is not none -%}
+      {{ '\n' }}{{ space }}{{ key }} = {{ value if value in ['true', 'false'] or
+      value is number or value.isdigit() else '"' ~ value ~ '"' }}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+{%- for key, value in (def | combine(v.over | default({}), recursive=True)).items() -%}
+  {{ render_block(key, value) }}
+{%- endfor -%}

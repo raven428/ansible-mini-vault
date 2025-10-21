@@ -1,0 +1,126 @@
+---
+- name: Call mega-service role
+  ansible.builtin.include_role:
+    name: raven428.mega_service
+  vars:
+    mesv_install_pkgs:
+      - package:
+          name:
+            - python3-requests
+          state: present
+          update_cache: true
+          install_recommends: false
+          check_mode: false
+    mesv_install_groups:
+      - name: "{{ unit_name }}"
+    mesv_install_users:
+      - name: "{{ unit_name }}"
+        group: "{{ unit_name }}"
+        home: "{{ service_home }}"
+        shell: "/usr/sbin/nologin"
+        password_expire_warn: 3
+        create_home: false
+    mesv_install_dirs:
+      - path: "{{ local_bin_path }}"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      - path: "{{ service_home | dirname }}"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      - path: "{{ service_home }}"
+        owner: "{{ unit_name }}"
+        group: "{{ unit_name }}"
+        mode: "0700"
+      - path: "{{ secure_dir | dirname }}"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      - path: "{{ secure_dir }}/{{ unit_name }}"
+        owner: "root"
+        group: "root"
+        mode: "0700"
+    mesv_remove_entries:
+      - dest: "{{ service_home }}"
+        recurse: true
+      - dest: "{{ local_bin_path }}/{{ unit_name }}"
+        recurse: false
+    mesv_install_templates:
+      - src: "templates/service-restricted.j2"
+        dest: "/etc/systemd/system/{{ unit_name }}.service"
+        mode: "0440"
+        force: "yes"
+        vars:
+          unit:
+            Description: "Node {{ unit_name }} service"
+            StartLimitIntervalSec: "60"
+            StartLimitBurst: "3"
+          service:
+            Type: "notify"
+            EnvironmentFile: "-/etc/default/{{ unit_name }}"
+            User: "{{ unit_name }}"
+            Group: "{{ unit_name }}"
+            PrivateTmp: "yes"
+            PrivateDevices: "yes"
+            SecureBits: "keep-caps"
+            AmbientCapabilities: "CAP_IPC_LOCK"
+            CapabilityBoundingSet: "CAP_SYSLOG CAP_IPC_LOCK"
+            NoNewPrivileges: "yes"
+            ExecStart: "{{ local_bin_path }}/{{ unit_name }} server
+              -config=/etc/vault.hcl"
+            ExecReload: "/bin/kill --signal HUP $MAINPID"
+            KillMode: "process"
+            KillSignal: "SIGINT"
+            Restart: "always"
+            RestartSec: "5"
+            TimeoutStopSec: "30"
+            LimitMEMLOCK: "infinity"
+            LimitCORE: "0"
+            SyslogIdentifier: "{{ unit_name }}"
+            ReadWritePaths: "{{ service_home }}"
+      - src: "templates/vault.hcl.j2"
+        dest: "/etc/vault.hcl"
+        owner: "{{ unit_name }}"
+        group: "{{ unit_name }}"
+        mode: "0440"
+        force: "yes"
+        vars:
+          hashi_vault_service_home: "{{ service_home }}"
+          over:
+            listener2: ~
+            disable_mlock: "true" # do NOT use in real vault
+            storage:
+              params:
+                test: null
+            listener1:
+              params:
+                address: "0.0.0.0:8200"
+    mesv_config_service:
+      - systemd:
+          name: "{{ unit_name }}"
+          state: started
+          force: true
+          masked: false
+          enabled: false
+          daemon_reload: true
+          when: "{{ not ansible_check_mode }}"
+    mesv_install_downloads:
+      - url: "{{ download_source | mandatory }}"
+        http_agent: "{{ user_agent | default('curl/7.77.777') }}"
+        creates: "non-existent/{{ unit_name }}"
+        dest: "{{ download_root | default('/tmp/ansible/mini-vault') }}"
+        archive: true
+        files:
+          - name: "{{ unit_name }}"
+            dest: "{{ local_bin_path }}/{{ unit_name }}"
+            file_mode: "0755"
+  tags: [service-vault]
+
+- name: Vault opera
+  vault_opera:
+    shares: "{{ shares | default(omit) }}"
+    threshold: "{{ threshold | default(omit) }}"
+    keys_dir: "{{ keys_dir | default(omit) }}"
+    keys_list: "{{ keys_list | default(omit) }}"
+  tags: [vault-opera]
