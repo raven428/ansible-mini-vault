@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: mini_vault
+  namespace: raven428
+  author: Dmitry Sukhodoyev
+  description: deploy HashiCorp vault mini role
+  license: AGPLv3
+  min_ansible_version: "2.13"
+  galaxy_tags:
+    - vault
+    - deploy
+    - service
+    - hashicorp

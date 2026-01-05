@@ -1,0 +1,40 @@
+---
+- name: Read key files
+  ansible.builtin.shell: "/usr/bin/env cat {{ secure_dir }}/{{ unit_name
+    }}/unseal* 2>/dev/null || true"
+  register: read_keys
+  changed_when: false
+
+- name: Remove key files
+  ansible.builtin.shell: "/usr/bin/env rm -v {{ secure_dir }}/{{ unit_name
+    }}/unseal* 2>/dev/null || true"
+  changed_when: false
+
+- name: Restart systemd service before unseal failure
+  ansible.builtin.systemd:
+    name: "{{ unit_name }}"
+    state: "restarted"
+  when: "prop_mode != 'fail-stop'"
+
+- name: Block for failures
+  block:
+    - name: Call role with keys in variable
+      ansible.builtin.include_role:
+        name: ansible-mini-vault
+      vars:
+        keys_list: "{{ read_keys.stdout_lines[:2] }}"
+      when: "prop_mode == 'fail-variable'"
+    - name: Call role with multiple purposes
+      ansible.builtin.include_role:
+        name: ansible-mini-vault
+      when: "prop_mode in ['fail-files', 'fail-stop']"
+  rescue:
+    - name: Set fact to success converge
+      ansible.builtin.set_fact:
+        rescue_happened: true
+
+- name: Assert rescue happened
+  ansible.builtin.assert:
+    that: "rescue_happened | default(false)"
+    fail_msg: Rescue isn't happened when [{{ prop_mode }}] should failure
+    success_msg: Rescue happened when [{{ prop_mode }}] as it should be
