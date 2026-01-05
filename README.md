@@ -6,3 +6,18 @@ A mini role performing deploy, configure and init a bootstrap Vault to keep:
 
 1. unseal keys for main vault cluster in k8s with HA
 2. some non-operative data for rare usage
+
+## Role release to Ansible galaxy
+
+- clone me:
+
+  ```bash
+  git clone --recursive git@github.com:raven428/ansible-mini-vault.git ansible-mini-vault
+  ```
+
+- make tag and send to release:
+
+  ```bash
+  export VER='1.0.1' && git checkout master && git pull
+  git tag -fm $(git branch --sho) ${VER} && git push --force origin $(git describe)
+  ```
