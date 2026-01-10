@@ -14,3 +14,11 @@ molecule_mode: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_MODE',
   default='converge') }}"
 molecule_stage: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_STAGE',
   default='action') }}"
+override_hcl:
+  disable_mlock: "true" # do NOT use in real vault
+  listener:
+    params:
+      address: "0.0.0.0:8200"
+  storage:
+    params:
+      path: "{{ service_home }}"
