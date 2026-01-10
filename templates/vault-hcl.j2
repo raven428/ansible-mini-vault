@@ -8,29 +8,28 @@
     'value': 'tcp',
     'params': {
       'tls_disable': '1',
-      'address': '127.0.0.1:8200',
+      'address': '127.0.0.2:8200',
     },
   },
   'storage': {
-    'name': 'storage',
-    'value': 'file',
+    'value': 'raft',
     'params': {
-      'path': v.hashi_vault_service_home | default('/var/lib/vault-default'),
+      'path': '/var/lib/hashicorp-vault',
       'test': '425',
     },
   },
 } -%}
 {%- macro render_block(name, data, indent=0) -%}
   {%- set space = '  ' * indent -%}
-  {%- if data is mapping and 'name' in data and 'value' in data and 'params' in data -%}
-    {{ '\n' }}{{ space }}{{ data.name }} "{{ data.value }}" {
+  {%- if data is mapping and 'value' in data and 'params' in data -%}
+    {{ '\n' }}{{ space }}{{ data.name | default(name) }} "{{ data.value }}" {
     {%- for k, v in data.params.items() -%}
       {{ render_block(k, v, indent + 1) }}
     {%- endfor -%}
     {{ '\n' }}{{ space }}}
   {%- else -%}
-    {%- if data is mapping and 'name' in data and 'value' in data -%}
-      {%- set key = data.name -%}
+    {%- if data is mapping and 'value' in data -%}
+      {%- set key = data.name | default(name) -%}
       {%- set value = data.value -%}
     {%- else -%}
       {%- set key = name -%}
@@ -44,4 +43,4 @@
 {%- endmacro -%}
 {%- for key, value in (def | combine(v.over | default({}), recursive=True)).items() -%}
   {{ render_block(key, value) }}
-{%- endfor -%}
+{%- endfor %}
