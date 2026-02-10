@@ -1,0 +1,28 @@
+---
+ansible_managed: "managed by Ansible"
+service_home: "/var/lib/vault"
+unit_name: "vault1"
+default_hcl:
+  listener1:
+    name: "listener"
+    value: "tcp"
+    params:
+      tls_disable: 1
+      address: "127.0.0.1:8200"
+  storage:
+    value: "raft"
+    params:
+      test: null
+      node_id: "{{ unit_name }}"
+  api_addr: "http://127.0.0.1:8200"
+  cluster_addr: "https://127.0.0.1:8201"
+override_hcl:
+  disable_mlock: "true" # do NOT use in real vault
+  listener1:
+    params:
+      address: "0.0.0.0:8200"
+  storage:
+    params:
+      path: "{{ service_home }}"
+v:
+  over: "{{ default_hcl | combine(override_hcl | default({}), recursive=True) }}"

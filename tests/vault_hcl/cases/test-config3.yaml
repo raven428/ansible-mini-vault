@@ -1,0 +1,21 @@
+---
+ansible_managed: "managed by Ansible"
+service_home: "/var/lib/vault"
+unit_name: "vault1"
+default_hcl:
+  listener1: ~
+  listener:
+    name: "listener"
+    value: "tcp"
+    params:
+      tls_disable: 1
+      address: "127.0.0.1:8200"
+  storage:
+    value: "raft"
+    params:
+      test: null
+      node_id: "{{ unit_name }}"
+  api_addr: "http://127.0.0.1:8200"
+  cluster_addr: "https://127.0.0.1:8201"
+v:
+  over: "{{ default_hcl }}"

@@ -1,0 +1,6 @@
+---
+# This case should succeed because ansible_managed is defined
+ansible_managed: "Ansible managed"
+v:
+  over:
+    ui: "true"

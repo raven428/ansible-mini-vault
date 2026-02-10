@@ -1,0 +1,10 @@
+---
+# This case should fail because service_home is not defined
+ansible_managed: "managed by Ansible"
+v:
+  over:
+    ui: "true"
+override_hcl:
+  storage:
+    params:
+      path: "{{ service_home }}"
