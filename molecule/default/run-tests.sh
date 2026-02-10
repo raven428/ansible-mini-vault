@@ -78,5 +78,6 @@ elif [[ "${ANSIBLE_CALL_MODE:-empty}" == 'def2' ]]; then
   run_group "service-vault,service-stop"
 else
   echo "unknown [${ANSIBLE_CALL_MODE:-empty}] in ANSIBLE_CALL_MODE env"
+  ansible-docker.sh molecule -v converge -s "${sce}"
   exit 1
 fi

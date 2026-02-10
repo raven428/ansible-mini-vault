@@ -144,9 +144,9 @@ class Vault:
     self.keys_dir = Path(module.params['keys_dir'])
     self.keys_list = module.params['keys_list']
 
-  def vault_put(self, endpoint: str, data: dict) -> dict:
+  def vault_put(self, endpoint: str, data: dict, timeout: int = 5) -> dict:
     try:
-      response = requests.put(endpoint, json=data, timeout=5)
+      response = requests.put(endpoint, json=data, timeout=timeout)
       response.raise_for_status()
       return response.json()
     except (requests.RequestException, json.JSONDecodeError) as err:
@@ -237,6 +237,7 @@ class Vault:
           'secret_shares': self.shares,
           'secret_threshold': self.threshold,
         },
+        22,
       )
       self._store_keys(init_resp)
     return self.get_seal_status(), True

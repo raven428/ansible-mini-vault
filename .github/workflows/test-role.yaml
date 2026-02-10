@@ -59,6 +59,7 @@ jobs:
           curl -sL \
           https://raw.githubusercontent.com/raven428/container-images/refs/heads/${{
           env.BRA }}/sources/ansible-ubuntu/check-dir.sh | bash
+          tests/run-tests.sh
   MegaLinter:
     name: MegaLinter
     timeout-minutes: 11
@@ -68,10 +69,30 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: restore cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/containers
+          key: podman-${{ runner.os }}-megalinter-v9-${{
+            hashFiles('.github/workflows/test-role.yaml') }}
+          restore-keys: |
+            podman-${{ runner.os }}-megalinter-v9-
       - name: MegaLinter
-        uses: oxsecurity/megalinter@v9
-        env:
-          VALIDATE_ALL_CODEBASE: true
+        id: megalinter
+        continue-on-error: true
+        run: |
+          /usr/bin/env podman run --log-driver=none -e GITHUB_ACTIONS=true --rm \
+          --network=host -v "$(pwd)":/tmp/lint ghcr.io/oxsecurity/megalinter:v9
+      - name: save cache
+        uses: actions/cache@v4
+        if: steps.megalinter.outcome == 'failure'
+        with:
+          path: ~/.local/share/containers
+          key: podman-${{ runner.os }}-megalinter-v9-${{
+            hashFiles('.github/workflows/test-role.yaml') }}
+      - name: check result
+        if: steps.megalinter.outcome == 'failure'
+        run: exit 1
   all-green:
     name: all green
     timeout-minutes: 5

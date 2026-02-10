@@ -1,0 +1,5 @@
+---
+# This case should fail because ansible_managed is not defined
+v:
+  over:
+    ui: "true"

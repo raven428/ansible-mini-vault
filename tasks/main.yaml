@@ -51,6 +51,7 @@
         dest: "/etc/systemd/system/{{ unit_name }}.service"
         mode: "0440"
         force: "yes"
+        diff: true
         vars:
           unit:
             Description: "Node {{ unit_name }} service"
@@ -79,23 +80,33 @@
             LimitCORE: "0"
             SyslogIdentifier: "{{ unit_name }}"
             ReadWritePaths: "{{ service_home }}"
-      - src: "templates/vault.hcl.j2"
+            SystemCallFilter: "@default @aio @basic-io @file-system @io-event @keyring
+              @memlock @network-io @process @signal @sync @timer flock mprotect pipe2
+              uname madvise"
+      - src: "templates/vault-hcl.j2"
         dest: "/etc/vault.hcl"
         owner: "{{ unit_name }}"
         group: "{{ unit_name }}"
         mode: "0440"
         force: "yes"
+        diff: true
         vars:
-          hashi_vault_service_home: "{{ service_home }}"
-          over:
-            listener2: ~
-            disable_mlock: "true" # do NOT use in real vault
-            storage:
-              params:
-                test: null
-            listener1:
-              params:
-                address: "0.0.0.0:8200"
+          over: "{{ default_hcl | combine(override_hcl | default({}), recursive=True) }}"
+    default_hcl:
+      listener1: ~
+      listener:
+        name: "listener"
+        value: "tcp"
+        params:
+          tls_disable: 1
+          address: "127.0.0.1:8200" # DevSkim: ignore DS162092
+      storage:
+        value: "raft"
+        params:
+          test: null
+          node_id: "{{ unit_name }}"
+      api_addr: "http://127.0.0.1:8200" # DevSkim: ignore DS162092
+      cluster_addr: "https://127.0.0.1:8201" # DevSkim: ignore DS162092
     mesv_config_service:
       - systemd:
           name: "{{ unit_name }}"
