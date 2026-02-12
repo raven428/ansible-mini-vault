@@ -6,6 +6,7 @@
     mesv_install_pkgs:
       - package:
           name:
+            - unzip
             - python3-requests
           state: present
           update_cache: true
