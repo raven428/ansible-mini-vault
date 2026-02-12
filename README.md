@@ -18,6 +18,6 @@ A mini role performing deploy, configure and init a bootstrap Vault to keep:
 - make tag and send to release:
 
   ```bash
-  export VER='1.0.1' && git checkout master && git pull
-  git tag -fm $(git branch --sho) ${VER} && git push --force origin $(git describe)
+  git checkout master && git pull
+  git tag -fm $(git branch --sho) 1.0.2 && git push --force origin $(git describe)
   ```
