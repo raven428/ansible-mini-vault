@@ -9,7 +9,6 @@ download_source: "https://{{ lookup('ansible.builtin.env', 'ANSIBLE_VAULT_SERVER
   default='yahoo.com') }}/openwrt-{{ lookup('ansible.builtin.env',
   'ANSIBLE_VAULT_SECRET', default='some-secret-in-location')
   }}/downloads/vault_1.20.4_linux_amd64.zip"
-skip_tags_list: ["service-start"]
 molecule_mode: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_MODE',
   default='converge') }}"
 molecule_stage: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_STAGE',
@@ -19,6 +18,3 @@ override_hcl:
   listener:
     params:
       address: "0.0.0.0:8200"
-  storage:
-    params:
-      path: "{{ service_home }}"

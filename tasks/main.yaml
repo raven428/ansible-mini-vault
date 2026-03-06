@@ -6,6 +6,7 @@
     mesv_install_pkgs:
       - package:
           name:
+            - unzip
             - python3-requests
           state: present
           update_cache: true
@@ -13,13 +14,14 @@
           check_mode: false
     mesv_install_groups:
       - name: "{{ unit_name }}"
+        system: true
     mesv_install_users:
       - name: "{{ unit_name }}"
         group: "{{ unit_name }}"
         home: "{{ service_home }}"
         shell: "/usr/sbin/nologin"
-        password_expire_warn: 3
         create_home: false
+        system: true
     mesv_install_dirs:
       - path: "{{ local_bin_path }}"
         owner: "root"
@@ -93,6 +95,7 @@
         vars:
           over: "{{ default_hcl | combine(override_hcl | default({}), recursive=True) }}"
     default_hcl:
+      disable_mlock: "false"
       listener1: ~
       listener:
         name: "listener"
@@ -105,6 +108,7 @@
         params:
           test: null
           node_id: "{{ unit_name }}"
+          path: "{{ service_home }}"
       api_addr: "http://127.0.0.1:8200" # DevSkim: ignore DS162092
       cluster_addr: "https://127.0.0.1:8201" # DevSkim: ignore DS162092
     mesv_config_service:

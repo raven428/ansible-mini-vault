@@ -53,6 +53,8 @@ CONT_BRIDGE_NAME='bridge'
     sleep 1
   done
 }
+/usr/bin/env "${CONTENGI}" exec "${CONT_NAME}" bash -c 'apt-get update &&
+DEBIAN_FRONTEND=noninteractive apt-get install -y git'
 export ANSIBLE_ROLES_PATH='/tmp/ansible/roles2test'
 deps_dir='deps/roles'
 [[ -d ${deps_dir} ]] || {
