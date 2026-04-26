@@ -51,7 +51,7 @@ jobs:
       - name: test role
         env:
           ANSIBLE_CALL_MODE: ${{ matrix.call_mode }}
-          IMAGE_NAME: ansible-${{ matrix.ansible_ver }}:latest
+          APPIMAGE_NAME: "ansible-${{ matrix.ansible_ver }}-001.AppImage"
           MEGA_VAR_REF: ${{ inputs.mega_var_ref }}
           MEGA_LAUNCH_REF: ${{ inputs.mega_launch_ref }}
           MEGA_SERVICE_REF: ${{ inputs.mega_service_ref }}
