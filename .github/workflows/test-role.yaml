@@ -8,6 +8,21 @@ on:
   pull_request:
   schedule:
     - cron: "11 11 * * 1"
+  # checkov:skip=CKV_GHA_7
+  workflow_dispatch:
+    inputs:
+      mega_var_ref:
+        description: "ansible-mega-var branch/tag to test against"
+        required: false
+        default: ""
+      mega_launch_ref:
+        description: "ansible-launch-var branch/tag to test against"
+        required: false
+        default: ""
+      mega_service_ref:
+        description: "ansible-service-var branch/tag to test against"
+        required: false
+        default: ""
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
@@ -39,11 +54,15 @@ jobs:
           IMAGE_NAME: ansible-${{ matrix.ansible_ver }}:latest
           ANSIBLE_VAULT_SERVER: ${{ secrets.VAULT_DOWNLOAD_SERVER }}
           ANSIBLE_VAULT_SECRET: ${{ secrets.VAULT_DOWNLOAD_SECRET }}
+          MEGA_VAR_REF: ${{ inputs.mega_var_ref }}
+          MEGA_LAUNCH_REF: ${{ inputs.mega_launch_ref }}
+          MEGA_SERVICE_REF: ${{ inputs.mega_service_ref }}
         run: molecule/default/run-tests.sh
   linters:
     name: linters
     timeout-minutes: 11
     runs-on: ubuntu-24.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
         with:
@@ -64,6 +83,7 @@ jobs:
     name: MegaLinter
     timeout-minutes: 11
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
         with:
