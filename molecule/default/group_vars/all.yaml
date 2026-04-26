@@ -5,10 +5,11 @@ download_root: "/tmp/molecule"
 check_flag: "{{ download_root }}/to-notify-verifier-that-converged-in-check-mode"
 call_mode: "{{ lookup('ansible.builtin.env', 'ANSIBLE_CALL_MODE', default='full') }}"
 prop_mode: "{{ lookup('ansible.builtin.env', 'ANSIBLE_PROP_MODE', default='none') }}"
-download_source: "https://{{ lookup('ansible.builtin.env', 'ANSIBLE_VAULT_SERVER',
-  default='yahoo.com') }}/openwrt-{{ lookup('ansible.builtin.env',
-  'ANSIBLE_VAULT_SECRET', default='some-secret-in-location')
-  }}/downloads/vault_1.20.4_linux_amd64.zip"
+download_source: "https://{{ lookup('ansible.builtin.env', 'ANSIBLE_VAULT_SERVER')
+  + '/openwrt-' + lookup('ansible.builtin.env', 'ANSIBLE_VAULT_SECRET') if lookup(\
+  'ansible.builtin.env', 'ANSIBLE_VAULT_SERVER') and lookup('ansible.builtin.env',
+  'ANSIBLE_VAULT_SECRET') else 'releases.hashicorp.com' }}/vault/1.20.4/vault_1.20.4_li\
+  nux_amd64.zip"
 molecule_mode: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_MODE',
   default='converge') }}"
 molecule_stage: "{{ lookup('ansible.builtin.env', 'ANSIBLE_MOLECULE_STAGE',
