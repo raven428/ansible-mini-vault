@@ -19,5 +19,5 @@ A mini role performing deploy, configure and init a bootstrap Vault to keep:
 
   ```bash
   git checkout master && git pull
-  git tag -fm $(git branch --sho) 1.0.3 && git push --force origin $(git describe)
+  git tag -fm $(git branch --sho) 1.0.4 && git push --force origin $(git describe)
   ```
