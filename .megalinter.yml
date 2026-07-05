@@ -71,3 +71,5 @@ PYTHON_PYRIGHT_PRE_COMMANDS:
       deactivate
       pip install pytest PyYAML ansible-core==$VER jinja2
     cwd: workspace
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
