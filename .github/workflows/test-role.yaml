@@ -14,14 +14,17 @@ on:
       mega_var_ref:
         description: "ansible-mega-var branch/tag to test against"
         required: false
+        type: string
         default: ""
       mega_launch_ref:
         description: "ansible-launch-var branch/tag to test against"
         required: false
+        type: string
         default: ""
       mega_service_ref:
         description: "ansible-service-var branch/tag to test against"
         required: false
+        type: string
         default: ""
 permissions: {}
 env:
