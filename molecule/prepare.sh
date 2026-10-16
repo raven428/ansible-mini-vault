@@ -2,7 +2,7 @@
 set -ueo pipefail
 umask 0022
 : "${APPIMAGE_RELEASE:="latest"}"
-: "${APPIMAGE_NAME:="ansible-11-001.AppImage"}"
+: "${APPIMAGE_NAME:="ansible-11-005.AppImage"}"
 export DEBIAN_FRONTEND=noninteractive
 _gh_base='https://github.com/raven428/container-images/releases'
 _appimage_bin="${HOME}/bin/ansible-current.AppImage"
