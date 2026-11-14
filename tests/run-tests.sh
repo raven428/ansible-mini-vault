@@ -4,6 +4,8 @@ umask 0022
 MY_BIN="$(realpath "$0")"
 MY_PATH="$(dirname "${MY_BIN}")"
 cd "${MY_PATH}/.."
+# shellcheck disable=2034
+ANSIBLE_VER='11'
 # shellcheck disable=1091
 source "${MY_PATH}/../molecule/prepare.sh"
 # shellcheck disable=2154
