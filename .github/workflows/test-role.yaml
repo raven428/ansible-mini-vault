@@ -58,6 +58,7 @@ jobs:
           persist-credentials: false
       - name: test role
         env:
+          ANSIBLE_VER: "${{ matrix.ansible_ver }}"
           ANSIBLE_CALL_MODE: ${{ matrix.call_mode }}
           MEGA_VAR_REF: ${{ inputs.mega_var_ref }}
           MEGA_LAUNCH_REF: ${{ inputs.mega_launch_ref }}
