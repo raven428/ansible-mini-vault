@@ -21,6 +21,9 @@ if [[ -n "${MEGA_VAR_REF:-}" ]]; then
     "${ANSIBLE_ROLES_PATH}/raven428.mega_var"
 else
   echo 'MEGA_VAR_REF input missed'
+  if [[ "${GITHUB_EVENT_NAME:-}" == 'workflow_dispatch' ]]; then
+    exit 1
+  fi
 fi
 if [[ -n "${MEGA_LAUNCH_REF:-}" ]]; then
   echo "MEGA_LAUNCH_REF=${MEGA_LAUNCH_REF}"
@@ -30,6 +33,9 @@ if [[ -n "${MEGA_LAUNCH_REF:-}" ]]; then
     "${ANSIBLE_ROLES_PATH}/raven428.mega_launch"
 else
   echo 'MEGA_LAUNCH_REF input missed'
+  if [[ "${GITHUB_EVENT_NAME:-}" == 'workflow_dispatch' ]]; then
+    exit 1
+  fi
 fi
 if [[ -n "${MEGA_SERVICE_REF:-}" ]]; then
   echo "MEGA_SERVICE_REF=${MEGA_SERVICE_REF}"
@@ -39,6 +45,9 @@ if [[ -n "${MEGA_SERVICE_REF:-}" ]]; then
     "${ANSIBLE_ROLES_PATH}/raven428.mega_service"
 else
   echo 'MEGA_SERVICE_REF input missed'
+  if [[ "${GITHUB_EVENT_NAME:-}" == 'workflow_dispatch' ]]; then
+    exit 1
+  fi
 fi
 n=1
 run_group() {
