@@ -1,4 +1,5 @@
 ---
+# cspell:ignore openwrt
 unit_name: vault
 secure_dir: "/deploy/secure"
 download_root: "/tmp/molecule"

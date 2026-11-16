@@ -8,7 +8,7 @@ max_line_length = 90
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{*.md,molecule/default/files/**}]
+[{*.md,*.json,molecule/default/files/**}]
 max_line_length = unset
 
 [molecule/prepare.sh]

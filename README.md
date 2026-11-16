@@ -1,6 +1,6 @@
 # HashiCorp Vault mini role
 
-[![molecule](https://github.com/raven428/ansible-mini-vault/actions/workflows/test-role.yaml/badge.svg)](https://github.com/raven428/ansible-mini-vault/actions/workflows/test-role.yaml)
+[![molecule](https://github.com/raven428/ansible-mini-vault/actions/workflows/repo-test.yaml/badge.svg)](https://github.com/raven428/ansible-mini-vault/actions/workflows/repo-test.yaml)
 
 A mini role performing deploy, configure and init a bootstrap Vault to keep:
 

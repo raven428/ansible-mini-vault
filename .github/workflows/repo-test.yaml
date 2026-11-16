@@ -1,6 +1,7 @@
 # kics-scan disable=555ab8f9-2001-455e-a077-f2d0f41e2fb9
+# cspell:ignore dependabot LINTIGNORE
 ---
-name: test role
+name: repo test
 on:
   push:
     branches:
@@ -28,7 +29,6 @@ on:
         default: ""
 permissions: {}
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MEGA_VAR_REF: ${{ inputs.mega_var_ref }}
   MEGA_LAUNCH_REF: ${{ inputs.mega_launch_ref }}
   MEGA_SERVICE_REF: ${{ inputs.mega_service_ref }}
@@ -38,8 +38,15 @@ concurrency:
 jobs:
   default:
     name: t
+    # jscpd:ignore-start
+    if: github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]')
+    permissions:
+      contents: read
     timeout-minutes: 33
     runs-on: ubuntu-24.04
+    # jscpd:ignore-end
     strategy:
       fail-fast: false
       matrix:
@@ -54,11 +61,13 @@ jobs:
           - "10"
           - "11"
     steps:
-      - uses: actions/checkout@v7 # zizmor: ignore[unpinned-uses]
+      # jscpd:ignore-start
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
           persist-credentials: false
+      # jscpd:ignore-end
       - name: test role
         env:
           ANSIBLE_VER: "${{ matrix.ansible_ver }}"
@@ -66,41 +75,59 @@ jobs:
         run: molecule/default/run-tests.sh
   linters:
     name: linters
+    # jscpd:ignore-start
+    if: github.event_name != 'workflow_dispatch' &&
+      (github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'))
+    permissions:
+      contents: read
     timeout-minutes: 11
     runs-on: ubuntu-24.04
-    if: github.event_name != 'workflow_dispatch'
+    # jscpd:ignore-end
     steps:
-      - uses: actions/checkout@v7 # zizmor: ignore[unpinned-uses]
+      # jscpd:ignore-start
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
           persist-credentials: false
+      # jscpd:ignore-end
       - name: lint the repo
+        shell: bash
         env:
           BRA: master
+          USE_LINTIGNORE: true
         run: |
-          curl -sL \
-          https://raw.githubusercontent.com/raven428/container-images/refs/heads/${{
+          curl -fsL \
+          https://raw.githubusercontent.com/megalomania428/container-images/refs/heads/${{
           env.BRA }}/sources/linters-ubuntu-22_04/check-dir.sh | bash
-          curl -sL \
-          https://raw.githubusercontent.com/raven428/container-images/refs/heads/${{
+          curl -fsL \
+          https://raw.githubusercontent.com/megalomania428/container-images/refs/heads/${{
           env.BRA }}/_shared/install/ansible/check-dir.sh | bash
           tests/run-tests.sh
   MegaLinter:
     name: MegaLinter
+    # jscpd:ignore-start
+    if: github.event_name != 'workflow_dispatch' &&
+      (github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'))
+    permissions:
+      contents: read
     timeout-minutes: 11
     runs-on: ubuntu-24.04
-    if: github.event_name != 'workflow_dispatch'
+    # jscpd:ignore-end
     steps:
-      - uses: actions/checkout@v7 # zizmor: ignore[unpinned-uses]
+      # jscpd:ignore-start
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
           persist-credentials: false
-      - name: MegaLinter
-        uses: oxsecurity/megalinter@v9 # zizmor: ignore[unpinned-uses]
-        env:
-          VALIDATE_ALL_CODEBASE: true
+      # jscpd:ignore-end
+      - name: Run MegaLinter
+        uses: megalomania428/github-actions/megalinter@master
   all-green:
     name: all green
     timeout-minutes: 5
