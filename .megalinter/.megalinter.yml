@@ -1,0 +1,8 @@
+---
+EXTENDS: .megalinter-action.yml
+TERRAFORM_TERRAGRUNT_FILTER_REGEX_EXCLUDE: "tests/vault_hcl/cases"
+REPOSITORY_DEVSKIM_ARGUMENTS:
+  - "-f"
+  - "text"
+  - "--ignore-rule-ids"
+  - "DS162092"

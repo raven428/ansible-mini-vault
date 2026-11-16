@@ -1,4 +1,5 @@
 ---
+# cspell:ignore mesv pkgs MAINPID
 - name: Call mega-service role
   ansible.builtin.include_role:
     name: raven428.mega_service
