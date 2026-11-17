@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# cspell:ignore tmpfs Sukhodoyev NOEXEC NOSUID
+
 ANSIBLE_METADATA = {
   'metadata_version': '1.0.0',
   'status': ['preview'],
